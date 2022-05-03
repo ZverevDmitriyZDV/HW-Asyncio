@@ -1,0 +1,42 @@
+version: '3.1'
+
+
+
+networks:
+  net1:
+
+services:
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: aiohttp
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: aiohttp
+    ports:
+      - 5432:5432
+    networks:
+      net1:
+        aliases:
+          - database
+
+  app:
+    build:
+      context: .
+      args:
+        DB: 'postgres://aiohttp:1234@database/aiohttp'
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    container_name: app
+
+    depends_on:
+      - db
+    networks:
+      net1:
+        aliases:
+          - app
+    volumes:
+      - ./:/code
+
